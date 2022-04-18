@@ -13,8 +13,8 @@
 				<h2 class="products-title">Formulario de creación de productos</h2>
 			</div>
 		</div>
-		<div class="col-12"><!-- todos los datos debenn llegar al controlador -->
-			<form action="/products" method="POST"><!-- es POST porque en el router esta pasando por POST -->
+		<div class="col-12"><!-- todos los datos deben llegar al controlador -->
+			<form action="/products" method="POST" enctype="multipart/form-data"><!-- es POST porque en el router esta pasando por POST -->
 				<div class="row product-detail">
 					<div class="col-12 col-md-6">
 						<label for="name" class="form-label">Nombre del producto:</label>
@@ -35,6 +35,10 @@
 							<option value="in-sale">En oferta</option>
 							<option value="visited">Últimos agregados</option>
 						</select>
+					</div>
+					<div class="input-group mb-5 col-12 col-md-6">
+						<label class="input-group-text" for="inputGroupFile01">Upload</label>
+						<input type="file" name="image" class="form-control" id="inputGroupFile01" name="image">
 					</div>
 					<div class="col-12">
 						<label for="description" class="form-label">Descipción:</label>

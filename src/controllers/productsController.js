@@ -3,7 +3,7 @@ const path = require('path');
 
 const productsFilePath = path.join(__dirname, '../data/productsDataBase.json');
 const products = JSON.parse(fs.readFileSync(productsFilePath, 'utf-8'));
-/* const writeJson = database => fs.writeFileSync(productsFilePath, JSON.stringify(database), "utf-8") */
+const writeJson = database => fs.writeFileSync(productsFilePath, JSON.stringify(database), "utf-8")
 const toThousand = n => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
 const controller = {
@@ -33,7 +33,8 @@ const controller = {
 	
 	// Create -  Method to store
 	store: (req, res) => { //destructuring = agarra una propiedad y la guarda dentro de una variable
-		const [name, price, discount, category, decription] = req.body // el body es donde viajan los datos del formulario
+		const [name, price, discount, category, description] = req.body // el body es donde viajan los datos del formulario
+		/* res.send(req.file) */
 		let lastId = 1;
 		products.forEach(product => {
 			if(product.id > lastId){
@@ -41,7 +42,7 @@ const controller = {
 			}
 		});
 
-		/* let newProduct = {
+		let newProduct = {
 			id: lastId + 1,
 			name, //si la variable que tiene el valor que queremos guardar es igual a al nombre de la propiedad se deja como esta
 			price,
@@ -49,13 +50,13 @@ const controller = {
 			category,
 			description,
 			image: 'default-image-png'
-		} */
+		}
 
-		let newProduct = {
+		/* let newProduct = {
 			...req.body,
 			id: lastId = 1,
-			image:'default-image-png'
-		}
+			image: req.file ? req.file.filename : 'default-image-png'
+		} */
 
 		product.push(newProduct)
 
@@ -67,7 +68,7 @@ const controller = {
 
 	// Update - Form to edit
 	edit: (req, res) => {
-		let productId = +req.params.id
+		let productId = +req.params.id;
 		let productToEdit = products.find(product => product.id ===  productId)
 
 		res.render('product-edit-form', {
@@ -77,17 +78,26 @@ const controller = {
 	// Update - Method to update
 	update: (req, res) => {  
 		let productId = +req.params.id
-		const [name, price, discount, category, decription] = req.body
+		const [name, price, discount, category, description] = req.body
 		products.forEach(product => {
 			if(product.id === productId){
 				product.id = product.id,
 				product.name = name,
 				product.price = price,
 				product.discount = discount,
-				product.description = description,
+				product.description = description
+				if(req.file){
+					if (fs.existsSync('./public/images(products', product.image)){
+						fs.unlinkSync(`./public/images/products/${product.image}`)
+				}else{
+					console.log('No encontre el archivo')
+				}
+				product.image = req.file.filename
+			}else{
 				product.image = product.image
 			}
-		})
+		}
+	})
 		whriteJSON(products)
 
 		res.redirect(`/products/detail/${productId}`) //redirecciona al producto que se acaba de editar
@@ -99,10 +109,20 @@ const controller = {
 		
 		products.forEach(product =>{
 			if(product.id === productId ){
-				let productToDestroyIndex = products.indexOf(product) //si encuentra el elemento devuelve el indice sino trae -1
-				productToDestroyIndex !== -1 ? products.splice(productToDestryIndex, 1) : console.log('no encontre el producto')
+				if (fs.existsSync('./public/images(products', product.image)){
+					fs.unlinkSync(`./public/images/products/${product.image}`)
+				}else{
+					console.log('No encontre el archivo')
+				}
+
+			let productToDestroyIndex = products.indexOf(product) //si encuentra el elemento devuelve el indice sino trae -1
+			if (productToDestroyIndex !== -1) { 
+				products.splice(productToDestryIndex, 1)
 			// como primer parametro es el indice del elemento que se quiere borrar , el segundo, es la cantidad aa eliminar
+			}else {
+				console.log('No encontre el producto')
 			}
+		}
 		})
 
 		whriteJSON(products)
